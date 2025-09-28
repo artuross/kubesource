@@ -1,0 +1,19 @@
+[[tools.go]]
+version = "1.25.1"
+backend = "core:go"
+
+[[tools."go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"]]
+version = "v2.5.0"
+backend = "go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
+
+[[tools."go:gotest.tools/gotestsum"]]
+version = "1.13.0"
+backend = "go:gotest.tools/gotestsum"
+
+[[tools.just]]
+version = "1.42.4"
+backend = "aqua:casey/just"
+
+[[tools.kustomize]]
+version = "5.7.1"
+backend = "aqua:kubernetes-sigs/kustomize"

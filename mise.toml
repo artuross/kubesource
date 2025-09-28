@@ -1,0 +1,10 @@
+[tools]
+"go:github.com/golangci/golangci-lint/v2/cmd/golangci-lint" = "v2.5.0"
+"go:gotest.tools/gotestsum" = "latest"
+go = "1.25.1"
+just =  "latest"
+kustomize = "latest"
+
+[settings]
+experimental = true
+lockfile = true

@@ -1,0 +1,4 @@
+/coverage.out
+/dist/
+/test/argocd/base/source/charts
+/test/nginx/source/charts

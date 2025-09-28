@@ -1,0 +1,25 @@
+version: "2"
+formatters:
+  enable:
+    - gofmt
+    - gci
+    - gofumpt
+  settings:
+    gci:
+      custom-order: true
+      no-inline-comments: true
+      no-lex-order: true
+      no-prefix-comments: true
+      sections:
+        - standard
+        - default
+        - localmodule
+        - blank
+    gofmt:
+      simplify: true
+      rewrite-rules:
+        - pattern: "interface{}"
+          replacement: "any"
+    gofumpt:
+      module-path: "github.com/artuross/kubesource"
+      extra-rules: true
