@@ -10,6 +10,14 @@
 go install github.com/artuross/kubesource/cmd/kubesource@latest
 ```
 
+## usage
+
+```sh
+kubesource [flags]
+```
+
+`kubesource` will scan the current directory and all subdirectories for `kubesource.yaml` files, then process each file it finds.
+
 ## why
 
 I created `kubesource` to solve 2 problems:
@@ -27,9 +35,7 @@ I created `kubesource` to solve 2 problems:
 	Examples:
 
 	- I prefer to use a custom namespace for each component, but found that some Helm charts **always** create a namespace. I prefer to manage namespaces myself (outside of the provisioned app to avoid finalizer hell), so I want to filter out those resources.
-
 	- Some Helm charts create CRDs with no way to disable that. I like to manage CRDs separately.
-
 	- I would like to exclude any default Secrets, such as generated certificates.
 
 While both objectives can be achieved with `kustomize` alone, I found that the process is a bit difficult. Thus, `kubesource` aims to simplify the process while leaving further customization to `kustomize`.
