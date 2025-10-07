@@ -88,7 +88,7 @@ func ParseDocuments(content []byte) ([]ParsedDocument, error) {
 	for {
 		var document yaml.MapSlice
 		err := decoder.Decode(&document)
-		if errors.Is(io.EOF, err) {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 

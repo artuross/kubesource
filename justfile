@@ -7,5 +7,8 @@ build:
 format:
     golangci-lint fmt
 
+lint:
+	golangci-lint run
+
 run:
     go run ./cmd/kubesource

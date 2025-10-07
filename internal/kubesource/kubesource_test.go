@@ -3,10 +3,11 @@ package kubesource_test
 import (
 	"testing"
 
-	"github.com/artuross/kubesource/internal/kubesource"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/artuross/kubesource/internal/kubesource"
 )
 
 // TestFindDirectories exercises kubesource.FindDirectories with a table-driven approach
@@ -16,11 +17,10 @@ import (
 func TestFindDirectories(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		type testCase struct {
-			name          string
-			root          string
-			inputFiles    []string
-			expectDirs    []string
-			expectedError error
+			name       string
+			root       string
+			inputFiles []string
+			expectDirs []string
 		}
 
 		tests := []testCase{
