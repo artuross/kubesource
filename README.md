@@ -45,63 +45,84 @@ While both objectives can be achieved with `kustomize` alone, I found that the p
 Consider an example `kubesource.yaml` file:
 
 ```yaml
-apiVersion: kubesource.rcwz.pl/v1alpha1
+apiVersion: kubesource.rcwz.pl/v1alpha2
 kind: Config
-sourceDir: ./source
-targets:
-  - directory: ./app
-    filter:
-      exclude:
-        - kind: CustomResourceDefinition
-        - kind: Secret
-  - directory: ./crds
-    filter:
-      include:
-        - kind: CustomResourceDefinition
+sources:
+  - sourceDir: ./source
+    targets:
+      - directory: ./app
+        filter:
+          exclude:
+            - kind: CustomResourceDefinition
+            - kind: Secret
+      - directory: ./crds
+        filter:
+          include:
+            - kind: CustomResourceDefinition
 ```
 
 When executed, `kubesource` will attempt to find all directories containing `kubesource.yaml` file. For each file, it will:
 
-1. Render the manifests in `sourceDir` with `kustomize`.
-2. For each directory in `targets`:
-   1. Filter the rendered manifests based on `filter`.
-   2. Split the manifests into multiple files, one per resource.
-   3. Write all matching manifests to `directory`.
+1. For each entry in `sources`:
+   1. Render the manifests in `sourceDir` with `kustomize`.
+   2. For each directory in `targets`:
+      1. Filter the rendered manifests based on `filter`.
+      2. Split the manifests into multiple files, one per resource.
+      3. Write all matching manifests to `directory`.
 
 In the example above, `kubesource` will render manifests from `./source`, then:
 
 - write all resources except `CustomResourceDefinition` and `Secret` to `./app`;
 - write all `CustomResourceDefinition` to `./crds`.
 
+### multiple sources
+
+You can specify multiple sources in a single configuration file:
+
+```yaml
+apiVersion: kubesource.rcwz.pl/v1alpha2
+kind: Config
+sources:
+  - sourceDir: _source-internal
+    targets:
+      - directory: app-internal/base
+  - sourceDir: _source-external
+    targets:
+      - directory: app-external/base
+```
+
+This will render each source directory separately and write the results to the specified target directories.
+
 ### valid filters
 
 Example below includes all supported filters.
 
 ```yaml
-apiVersion: kubesource.rcwz.pl/v1alpha1
+apiVersion: kubesource.rcwz.pl/v1alpha2
 kind: Config
-sourceDir: ./source
-targets:
-  - directory: ./app
-    filter:
-      include:
-        - apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: my-config
-            namespace: my-namespace
-            labels:
-              app: my-app
-              version: v1.0.0
-      exclude:
-        - apiVersion: v1
-          kind: Secret
-          metadata:
-            name: my-secret
-            namespace: my-namespace
-            labels:
-              app: my-app
-              version: v1.0.0
+sources:
+  - sourceDir: ./source
+    targets:
+      - directory: ./app
+        filter:
+          include:
+            - apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: my-config
+                namespace: my-namespace
+                labels:
+                  app: my-app
+                  version: v1.0.0
+          exclude:
+            - apiVersion: v1
+              kind: Secret
+              metadata:
+                name: my-secret
+                namespace: my-namespace
+                labels:
+                  app: my-app
+                  version: v1.0.0
 ```
 
 In filters, ALL fields are optional. If a property is not specified, it will not be used for filtering.

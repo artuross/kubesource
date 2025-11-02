@@ -13,8 +13,13 @@ import (
 type Config struct {
 	APIVersion string   `yaml:"apiVersion"`
 	Kind       string   `yaml:"kind"`
-	SourceDir  string   `yaml:"sourceDir"`
-	Targets    []Target `yaml:"targets"`
+	Sources    []Source `yaml:"sources"`
+}
+
+// Source represents a source directory and its associated targets.
+type Source struct {
+	SourceDir string   `yaml:"sourceDir"`
+	Targets   []Target `yaml:"targets"`
 }
 
 // Target represents a target directory where rendered manifests should be saved.
@@ -67,12 +72,18 @@ func LoadConfig(afs afero.Fs, dir string) (*Config, error) {
 }
 
 func validateConfig(config Config) error {
-	if config.SourceDir == "" {
-		return errors.New("sourceDir is required")
+	if len(config.Sources) == 0 {
+		return errors.New("at least one source is required")
 	}
 
-	if len(config.Targets) == 0 {
-		return errors.New("at least one target is required")
+	for i, source := range config.Sources {
+		if source.SourceDir == "" {
+			return fmt.Errorf("sources[%d].sourceDir is required", i)
+		}
+
+		if len(source.Targets) == 0 {
+			return fmt.Errorf("sources[%d] must have at least one target", i)
+		}
 	}
 
 	return nil

@@ -59,41 +59,43 @@ func processSingleDirectory(afs afero.Fs, executor commandexec.CommandExecutor, 
 		return fmt.Errorf("loading config: %w", err)
 	}
 
-	sourceDir := path.Join(baseDir, cfg.SourceDir)
+	for _, source := range cfg.Sources {
+		sourceDir := path.Join(baseDir, source.SourceDir)
 
-	fmt.Printf("  Source directory: %s\n", sourceDir)
+		fmt.Printf("  Source directory: %s\n", sourceDir)
 
-	if err := kustomize.VerifyHasKustomizationFile(afs, sourceDir); err != nil {
-		return fmt.Errorf("validating source directory: %w", err)
-	}
-
-	kustomizeDocument, err := kustomize.Build(executor, sourceDir)
-	if err != nil {
-		return fmt.Errorf("building manifests: %w", err)
-	}
-
-	parsedDocuments, err := manifest.ParseDocuments(kustomizeDocument)
-	if err != nil {
-		return fmt.Errorf("parsing YAML documents: %w", err)
-	}
-
-	// save to each target directory with filtering
-	for _, target := range cfg.Targets {
-		targetPath := filepath.Join(baseDir, target.Directory)
-
-		if err := afs.RemoveAll(targetPath); err != nil {
-			return fmt.Errorf("cleaning target directory %s: %w", targetPath, err)
+		if err := kustomize.VerifyHasKustomizationFile(afs, sourceDir); err != nil {
+			return fmt.Errorf("validating source directory: %w", err)
 		}
 
-		includedFiles, err := getTargetDocuments(parsedDocuments, target.Filter)
+		kustomizeDocument, err := kustomize.Build(executor, sourceDir)
 		if err != nil {
-			return fmt.Errorf("generating target documents: %w", err)
+			return fmt.Errorf("building manifests: %w", err)
 		}
 
-		fmt.Printf("  Saving to: %s\n", targetPath)
+		parsedDocuments, err := manifest.ParseDocuments(kustomizeDocument)
+		if err != nil {
+			return fmt.Errorf("parsing YAML documents: %w", err)
+		}
 
-		if err := saveFiles(afs, targetPath, includedFiles); err != nil {
-			return fmt.Errorf("saving to %s: %w", targetPath, err)
+		// save to each target directory with filtering
+		for _, target := range source.Targets {
+			targetPath := filepath.Join(baseDir, target.Directory)
+
+			if err := afs.RemoveAll(targetPath); err != nil {
+				return fmt.Errorf("cleaning target directory %s: %w", targetPath, err)
+			}
+
+			includedFiles, err := getTargetDocuments(parsedDocuments, target.Filter)
+			if err != nil {
+				return fmt.Errorf("generating target documents: %w", err)
+			}
+
+			fmt.Printf("  Saving to: %s\n", targetPath)
+
+			if err := saveFiles(afs, targetPath, includedFiles); err != nil {
+				return fmt.Errorf("saving to %s: %w", targetPath, err)
+			}
 		}
 	}
 
